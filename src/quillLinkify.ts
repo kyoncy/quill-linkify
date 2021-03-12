@@ -20,8 +20,9 @@ export class QuillLinkify {
         const split = text.split(match);
 
         const beforeLink = split.shift();
-        if (beforeLink) delta.insert(beforeLink);
-
+        if (beforeLink && beforeLink !== "") {
+          this.searchLink(delta, beforeLink);
+        }
         delta.insert(match, { link: type.normalize(match) });
         if (split.join(match) !== "") {
           this.searchLink(delta, split.join(match));

@@ -136,5 +136,32 @@ describe("Linkify", () => {
         ],
       })
     })
+
+    test('should parse phone number and mail and url', () => {
+      const text = ' 090-1234-5678 https://example.com hoge@example.com ';
+      const node = new Text(text);
+      const delta = new Delta({ ops: [{ insert: text }] });
+
+      expect(matcherCallback(node, delta)).toEqual({
+        ops: [
+          { insert: ' ' },
+          {
+            insert: '090-1234-5678',
+            attributes: { link: 'tel:090-1234-5678' },
+          },
+          { insert: ' ' },
+          {
+            insert: 'https://example.com',
+            attributes: { link: 'https://example.com' },
+          },
+          { insert: ' ' },
+          {
+            insert: 'hoge@example.com',
+            attributes: { link: 'mailto:hoge@example.com' },
+          },
+          { insert: ' ' }
+        ],
+      })
+    })
   })
 })
