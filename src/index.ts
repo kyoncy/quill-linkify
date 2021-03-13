@@ -4,17 +4,23 @@ import Delta from 'quill-delta';
 import { MailType, PhoneNumberType, UrlType } from './linkTypes';
 import { QuillLinkify } from './quillLinkify';
 
+export type Options = {
+  url?: RegExp;
+  mail?: RegExp;
+  phoneNumber?: RegExp;
+};
+
 export class Linkify {
   quill: Quill;
 
   quillLinkify: QuillLinkify;
 
-  constructor(quill: Quill) {
+  constructor(quill: Quill, options?: Options) {
     this.quill = quill;
     this.quillLinkify = new QuillLinkify([
-      new UrlType(),
-      new MailType(),
-      new PhoneNumberType()
+      new UrlType(options?.url),
+      new MailType(options?.mail),
+      new PhoneNumberType(options?.phoneNumber)
     ]);
     this.pasteListener();
     this.typeListener();

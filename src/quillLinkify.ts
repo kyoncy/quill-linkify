@@ -24,8 +24,9 @@ export class QuillLinkify {
           this.searchLink(delta, beforeLink);
         }
         delta.insert(match, { link: type.normalize(match) });
-        if (split.join(match) !== "") {
-          this.searchLink(delta, split.join(match));
+        const afterLink = split.join(match);
+        if (afterLink !== "") {
+          this.searchLink(delta, afterLink);
         }
       }
     });
@@ -44,23 +45,11 @@ export class QuillLinkify {
     this.typeList.forEach(type => {
       const match = (leaf.text as string).match(type.regexp);
       if (match && match.index !== undefined) {
-        this.textToLink(
-          quill,
-          leafIndex + match.index,
-          match[0].length,
-          type.normalize(match[0])
-        );
+        const delta = new Delta()
+          .retain(leafIndex + match.index)
+          .retain(match[0].length, { link: type.normalize(match[0]) });
+        quill.updateContents(delta);
       }
     });
   }
-
-  textToLink = (
-    quill: Quill,
-    position: number,
-    length: number,
-    text: string
-  ): void => {
-    const delta = new Delta().retain(position).retain(length, { link: text });
-    quill.updateContents(delta);
-  };
 }
