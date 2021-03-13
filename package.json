@@ -1,6 +1,6 @@
 {
   "name": "quill-linkify",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Quill plugin that converts text to link",
   "keywords": [
     "quill",
