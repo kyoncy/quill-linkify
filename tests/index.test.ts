@@ -1,6 +1,6 @@
 import Quill from "quill";
 import Delta from "quill-delta";
-import { Linkify } from "../src/index";
+import { Linkify, Options } from "../src/index";
 
 describe("Linkify", () => {
   describe("PasteListener", () => {
@@ -13,14 +13,19 @@ describe("Linkify", () => {
             matcherCallback = callback;
           }
         },
-        on: () => {},
-        getSelection: () => {},
-        getLeaf: () => {},
-        getIndex: () => {},
-        updateContents: () => {},
+        on: () => { },
+        getSelection: () => { },
+        getLeaf: () => { },
+        getIndex: () => { },
+        updateContents: () => { },
       } as unknown as Quill;
+      const options = {
+        url: true,
+        mail: true,
+        phoneNumber: true,
+      };
 
-      new Linkify(quillMock);
+      new Linkify(quillMock, options);
     });
 
     test('should not alter plain text', () => {
@@ -162,6 +167,57 @@ describe("Linkify", () => {
           { insert: ' ' }
         ],
       })
+    })
+  })
+
+  describe("Linkify Option", () => {
+    let matcherCallback: (node: Text, delta: Delta) => Delta;
+
+    const initialize = (options: Options) => {
+      const quillMock = {
+        clipboard: {
+          addMatcher: (_nodeType: string | number, callback: (node: Text, delta: Delta) => Delta) => {
+            matcherCallback = callback;
+          }
+        },
+        on: () => { },
+        getSelection: () => { },
+        getLeaf: () => { },
+        getIndex: () => { },
+        updateContents: () => { },
+      } as unknown as Quill;
+
+      return new Linkify(quillMock, options);
+    };
+
+    test("should include url, mail, phone-number", () => {
+      const linkify = initialize({});
+      expect(linkify.quillLinkify.typeList.length).toEqual(3)
+    })
+
+    test("should not include url, mail, phone-number", () => {
+      const linkify = initialize({
+        url: false,
+        mail: false,
+        phoneNumber: false
+      });
+      expect(linkify.quillLinkify.typeList.length).toEqual(0)
+    })
+
+    test("should include only url", () => {
+      const linkify = initialize({
+        url: true,
+        mail: false,
+      });
+      expect(linkify.quillLinkify.typeList.length).toEqual(1)
+    })
+
+    test("should custom regexp only url", () => {
+      const linkify = initialize({
+        url: /sample/,
+      });
+      expect(linkify.quillLinkify.typeList.length).toEqual(1)
+      expect(linkify.quillLinkify.typeList[0].regexp).toEqual(/sample/)
     })
   })
 })

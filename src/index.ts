@@ -2,12 +2,13 @@ import Quill from 'quill';
 import Delta from 'quill-delta';
 
 import { MailType, PhoneNumberType, UrlType } from './linkTypes';
+import { AbstractType } from './linkTypes/AbstractType';
 import { QuillLinkify } from './quillLinkify';
 
 export type Options = {
-  url?: RegExp;
-  mail?: RegExp;
-  phoneNumber?: RegExp;
+  url?: RegExp | boolean;
+  mail?: RegExp | boolean;
+  phoneNumber?: RegExp | boolean;
 };
 
 export class Linkify {
@@ -15,13 +16,22 @@ export class Linkify {
 
   quillLinkify: QuillLinkify;
 
-  constructor(quill: Quill, options?: Options) {
+  constructor(quill: Quill, options: Options) {
+    const typeList: AbstractType[] = [];
+
+    console.log(options)
+    if (!Object.keys(options).length) {
+      typeList.push(new UrlType(true))
+      typeList.push(new MailType(true))
+      typeList.push(new PhoneNumberType(true))
+    } else if (options) {
+      options.url && typeList.push(new UrlType(options.url))
+      options.mail && typeList.push(new MailType(options.mail))
+      options.phoneNumber && typeList.push(new PhoneNumberType(options.phoneNumber))
+    }
+
     this.quill = quill;
-    this.quillLinkify = new QuillLinkify([
-      new UrlType(options?.url),
-      new MailType(options?.mail),
-      new PhoneNumberType(options?.phoneNumber)
-    ]);
+    this.quillLinkify = new QuillLinkify(typeList)
     this.pasteListener();
     this.typeListener();
   }
