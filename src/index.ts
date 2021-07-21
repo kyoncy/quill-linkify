@@ -19,7 +19,6 @@ export class Linkify {
   constructor(quill: Quill, options: Options) {
     const typeList: AbstractType[] = [];
 
-    console.log(options)
     if (!Object.keys(options).length) {
       typeList.push(new UrlType(true))
       typeList.push(new MailType(true))
